@@ -39,18 +39,19 @@ enum class NotificationType
 	SlicingWarning,
 	PlaterError,
 	PlaterWarning,
-	ApplyError
-
+	ApplyError,
+	ProgressBar
 };
 class NotificationManager
 {
 public:
 	enum class NotificationLevel : int
 	{
-		ErrorNotification =     4,
-		WarningNotification =   3,
-		ImportantNotification = 2,
-		RegularNotification   = 1,
+		ErrorNotification =       5,
+		WarningNotification =     4,
+		ProgressBarNotification = 3,
+		ImportantNotification =   2,
+		RegularNotification   =   1,
 	};
 	// duration 0 means not disapearing
 	struct NotificationData {
@@ -97,7 +98,7 @@ public:
         void                   hide(bool h) { m_hidden = h; }
 	protected:
 		// Call after every size change
-		void         init();
+		virtual void         init();
 		// Calculetes correct size but not se it in imgui!
 		virtual void set_next_window_size(ImGuiWrapper& imgui);
 		virtual void render_text(ImGuiWrapper& imgui,
@@ -197,6 +198,20 @@ public:
 		int    warning_step;
 	};
 
+	class ProgressBarNotification : public PopNotification
+	{
+	public:
+		ProgressBarNotification(const NotificationData& n, const int id, wxEvtHandler* evt_handler) : PopNotification(n, id, evt_handler) {}
+	protected:
+		virtual void init();
+		virtual void render_text(ImGuiWrapper& imgui,
+			                     const float win_size_x, const float win_size_y,
+			                     const float win_pos_x, const float win_pos_y);
+		void         render_bar(ImGuiWrapper& imgui,
+			                    const float win_size_x, const float win_size_y,
+			                    const float win_pos_x, const float win_pos_y);
+	};
+
 	NotificationManager(wxEvtHandler* evt_handler);
 	~NotificationManager();
 
@@ -228,6 +243,9 @@ public:
 	void push_slicing_complete_notification(GLCanvas3D& canvas, int timestamp, bool large);
 	void set_slicing_complete_print_time(std::string info);
 	void set_slicing_complete_large(bool large);
+	// notification with progress bar, 
+	void push_progress_bar_notification(const std::string& text, GLCanvas3D& canvas);
+
 	// renders notifications in queue and deletes expired ones
 	void render_notifications(GLCanvas3D& canvas, float overlay_width, float slope_width);
 	// finds and closes all notifications of given type
