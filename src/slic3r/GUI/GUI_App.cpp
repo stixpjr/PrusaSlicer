@@ -1704,6 +1704,11 @@ void GUI_App::MacOpenFiles(const wxArrayString &fileNames)
         // Load the first G-code into the G-code viewer.
         if (! gcode_files.empty())
             this->plater()->load_gcode(gcode_files.front());
+        else if (! files.empty()) {
+            for ( const auto& file : files) {
+                send_message_mac(file, get_instance_hash_string());
+            }
+        }
     } else {
         if (! files.empty())
             this->plater()->load_files(files, true, true);
