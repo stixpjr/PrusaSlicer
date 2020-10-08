@@ -1702,12 +1702,13 @@ void GUI_App::MacOpenFiles(const wxArrayString &fileNames)
     if (m_app_mode == EAppMode::GCodeViewer) {
         // Running in G-code viewer.
         // Load the first G-code into the G-code viewer.
+        // Or if no G-codes, send other files to slicer. 
         if (! gcode_files.empty())
             this->plater()->load_gcode(gcode_files.front());
         else if (!fileNames.empty()) {
             start_new_slicer(&fileNames.front(), true);
             for (size_t i = 1; i < fileNames.size(); ++i) {
-                send_message_mac(fileNames[i], get_instance_hash_string());
+                send_message_mac(into_u8(fileNames[i]), get_instance_hash_string());
             }
         }
     } else {
