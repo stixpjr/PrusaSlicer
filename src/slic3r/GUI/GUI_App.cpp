@@ -1705,7 +1705,7 @@ void GUI_App::MacOpenFiles(const wxArrayString &fileNames)
         if (! gcode_files.empty())
             this->plater()->load_gcode(gcode_files.front());
         else if (! files.empty()) {
-            start_new_slicer(files.begin());
+            start_new_slicer(boost::nowide::widen(files.begin()));
             /*for ( const auto& file : files) {
                 send_message_mac(file, get_instance_hash_string());
             }*/
