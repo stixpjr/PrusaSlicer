@@ -33,7 +33,7 @@ enum class NewSlicerInstanceType {
 
 // Start a new Slicer process instance either in a Slicer mode or in a G-code mode.
 // Optionally load a 3MF, STL or a G-code on start.
-static void start_new_slicer_or_gcodeviewer(const NewSlicerInstanceType instance_type, const wxString *path_to_open)
+static void start_new_slicer_or_gcodeviewer(const NewSlicerInstanceType instance_type, const wxString *path_to_open, bool single_instance)
 {
 #ifdef _WIN32
 	wxString path;
@@ -41,10 +41,12 @@ static void start_new_slicer_or_gcodeviewer(const NewSlicerInstanceType instance
 	path += "\\";
 	path += (instance_type == NewSlicerInstanceType::Slicer) ? "prusa-slicer.exe" : "prusa-gcodeviewer.exe";
 	std::vector<const wchar_t*> args;
-	args.reserve(3);
+	args.reserve(4);
 	args.emplace_back(path.wc_str());
 	if (path_to_open != nullptr)
 		args.emplace_back(path_to_open->wc_str());
+	if(instance_type == NewSlicerInstanceType::Slicer && single_instance)
+		args.emplace_back(L"--single-instance");
 	args.emplace_back(nullptr);
 	BOOST_LOG_TRIVIAL(info) << "Trying to spawn a new slicer \"" << into_u8(path) << "\"";
 	// Don't call with wxEXEC_HIDE_CONSOLE, PrusaSlicer in GUI mode would just show the splash screen. It would not open the main window though, it would
@@ -69,6 +71,8 @@ static void start_new_slicer_or_gcodeviewer(const NewSlicerInstanceType instance
             	args.emplace_back("--gcodeviewer");
             if (path_to_open)
                 args.emplace_back(into_u8(*path_to_open));
+			if (instance_type == NewSlicerInstanceType::Slicer && single_instance)
+				args.emplace_back("--single-instance");
             boost::process::spawn(bin_path, args);
 	    } catch (const std::exception &ex) {
 			BOOST_LOG_TRIVIAL(error) << "Failed to spawn a new slicer \"" << bin_path.string() << "\": " << ex.what();
@@ -102,6 +106,8 @@ static void start_new_slicer_or_gcodeviewer(const NewSlicerInstanceType instance
 	    	to_open = into_u8(*path_to_open);
 	    	args.emplace_back(to_open.c_str());
 	    }
+		if (instance_type == NewSlicerInstanceType::Slicer && single_instance)
+			args.emplace_back("--single-instance");
 	    args.emplace_back(nullptr);
 		BOOST_LOG_TRIVIAL(info) << "Trying to spawn a new slicer \"" << args[0] << "\"";
 	    if (wxExecute(const_cast<char**>(args.data()), wxEXEC_ASYNC | wxEXEC_MAKE_GROUP_LEADER) <= 0)
@@ -111,14 +117,14 @@ static void start_new_slicer_or_gcodeviewer(const NewSlicerInstanceType instance
 #endif // Win32
 }
 
-void start_new_slicer(const wxString *path_to_open)
+void start_new_slicer(const wxString *path_to_open, bool single_instance)
 {
-	start_new_slicer_or_gcodeviewer(NewSlicerInstanceType::Slicer, path_to_open);
+	start_new_slicer_or_gcodeviewer(NewSlicerInstanceType::Slicer, path_to_open, single_instance);
 }
 
 void start_new_gcodeviewer(const wxString *path_to_open)
 {
-	start_new_slicer_or_gcodeviewer(NewSlicerInstanceType::GCodeViewer, path_to_open);
+	start_new_slicer_or_gcodeviewer(NewSlicerInstanceType::GCodeViewer, path_to_open, false);
 }
 
 void start_new_gcodeviewer_open_file(wxWindow *parent)
