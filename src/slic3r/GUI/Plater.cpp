@@ -1409,7 +1409,7 @@ bool PlaterDropTarget::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString &fi
         else if (paths.size() == 1) {
                 plater->load_gcode(from_path(paths.front()));
                 return true;
-        }
+        } 
         return false;
     }
 #endif // ENABLE_GCODE_VIEWER
