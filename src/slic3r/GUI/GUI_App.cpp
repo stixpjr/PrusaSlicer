@@ -1696,12 +1696,15 @@ void GUI_App::MacOpenFiles(const wxArrayString &fileNames)
 {
     std::vector<std::string> files;
     std::vector<wxString>    gcode_files;
+    std::vector<wxString>    non_gcode_files;
     for (const auto& filename : fileNames) {
         wxString fn = filename.Upper();
         if (fn.EndsWith(".G") || fn.EndsWith(".GCODE"))
             gcode_files.emplace_back(filename);
-        else
+        else {
             files.emplace_back(into_u8(filename));
+            non_gcode_files.emplace_back(filename);
+        }
     }
     if (m_app_mode == EAppMode::GCodeViewer) {
         // Running in G-code viewer.
@@ -1709,11 +1712,11 @@ void GUI_App::MacOpenFiles(const wxArrayString &fileNames)
         // Or if no G-codes, send other files to slicer. 
         if (! gcode_files.empty())
             this->plater()->load_gcode(gcode_files.front());
-        else if (!fileNames.empty()) {
-            //start_new_slicer(&fileNames.front(), true);
-            for (size_t i = 0; i < fileNames.size(); ++i) {
+        else if (!non_gcode_files.empty()) {
+            start_new_slicer(non_gcode_files, true);
+            /*for (size_t i = 0; i < fileNames.size(); ++i) {
                 send_message_mac(into_u8(fileNames[i]), get_instance_hash_string());
-            }
+            }*/
         }
     } else {
         if (! files.empty())
