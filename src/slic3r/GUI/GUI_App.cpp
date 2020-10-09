@@ -1710,8 +1710,8 @@ void GUI_App::MacOpenFiles(const wxArrayString &fileNames)
         if (! gcode_files.empty())
             this->plater()->load_gcode(gcode_files.front());
         else if (!fileNames.empty()) {
-            start_new_slicer(&fileNames.front(), true);
-            for (size_t i = 1; i < fileNames.size(); ++i) {
+            //start_new_slicer(&fileNames.front(), true);
+            for (size_t i = 0; i < fileNames.size(); ++i) {
                 send_message_mac(into_u8(fileNames[i]), get_instance_hash_string());
             }
         }
