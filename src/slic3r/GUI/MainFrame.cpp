@@ -74,6 +74,8 @@ public:
         int id;
         auto *item = menu->Append(id = wxNewId(), "&Test menu");
         menu->Bind(wxEVT_MENU, [this](wxCommandEvent &) { wxMessageBox("Test menu - GCode Viewer"); }, id);
+        append_menu_item(menu, wxID_ANY, _(L("Open PrusaSlicer")), _(L("")),
+            [this](wxCommandEvent&) { start_new_slicer(); }, "", nullptr);
         return menu;
     }
 #endif
@@ -1265,7 +1267,8 @@ void MainFrame::init_menubar()
         
         windowMenu->AppendSeparator();
         append_menu_item(windowMenu, wxID_ANY, _(L("Open new instance")) + "\tCtrl+I", _(L("Open a new PrusaSlicer instance")),
-			[this](wxCommandEvent&) { start_new_slicer(); }, "", nullptr);
+			[this](wxCommandEvent&) { start_new_slicer(); }, "", nullptr, [this]() {return m_plater != nullptr && wxGetApp().app_config->get("single_instance") != "1"; }, this);
+
     }
 
     // View menu
