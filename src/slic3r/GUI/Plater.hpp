@@ -333,6 +333,8 @@ public:
 	const NotificationManager* get_notification_manager() const;
 	NotificationManager* get_notification_manager();
 
+    void bring_instance_forward() const;
+
     // ROII wrapper for suppressing the Undo / Redo snapshot to be taken.
 	class SuppressSnapshots
 	{

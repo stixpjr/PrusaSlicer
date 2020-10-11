@@ -2038,22 +2038,21 @@ Plater::priv::priv(Plater *q, MainFrame *main_frame)
     });
     this->q->Bind(EVT_INSTANCE_GO_TO_FRONT, [this](InstanceGoToFrontEvent &) { 
         BOOST_LOG_TRIVIAL(debug) << "prusaslicer window going forward";
-		//this code maximize app window on Fedora
-		{
-			wxGetApp().mainframe->Iconize(false);
-			if (wxGetApp().mainframe->IsMaximized())
-				wxGetApp().mainframe->Maximize(true);
-			else
-				wxGetApp().mainframe->Maximize(false);
-		}
-		//this code maximize window on Ubuntu
-		{
-			wxGetApp().mainframe->Restore();  
-			wxGetApp().GetTopWindow()->SetFocus();  // focus on my window
-			wxGetApp().GetTopWindow()->Raise();  // bring window to front
-			wxGetApp().GetTopWindow()->Show(true); // show the window
-		}
-
+        //this code maximize app window on Fedora
+        {
+            wxGetApp().mainframe->Iconize(false);
+            if (wxGetApp().mainframe->IsMaximized())
+                wxGetApp().mainframe->Maximize(true);
+            else
+                wxGetApp().mainframe->Maximize(false);
+        }
+        //this code maximize window on Ubuntu
+        {
+            wxGetApp().mainframe->Restore();
+            wxGetApp().GetTopWindow()->SetFocus();  // focus on my window
+            wxGetApp().GetTopWindow()->Raise();  // bring window to front
+            wxGetApp().GetTopWindow()->Show(true); // show the window
+        }
     });
 	wxGetApp().other_instance_message_handler()->init(this->q);
 
@@ -2066,6 +2065,10 @@ Plater::priv::priv(Plater *q, MainFrame *main_frame)
 #if ENABLE_GCODE_VIEWER
     }
 #endif // ENABLE_GCODE_VIEWER
+#ifdef __APPLE__
+    bring_instance_forward();
+#endif // __APPLE__
+
 }
 
 Plater::priv::~priv()
@@ -6002,6 +6005,26 @@ bool Plater::PopupMenu(wxMenu *menu, const wxPoint& pos)
         m_tracking_popup_menu_error_message.clear();
     }
 	return out;
+}
+
+void Plater::bring_instance_forward() const
+{
+    BOOST_LOG_TRIVIAL(debug) << "prusaslicer window going forward";
+    //this code maximize app window on Fedora
+    {
+        wxGetApp().mainframe->Iconize(false);
+        if (wxGetApp().mainframe->IsMaximized())
+            wxGetApp().mainframe->Maximize(true);
+        else
+            wxGetApp().mainframe->Maximize(false);
+    }
+    //this code maximize window on Ubuntu
+    {
+        wxGetApp().mainframe->Restore();
+        wxGetApp().GetTopWindow()->SetFocus();  // focus on my window
+        wxGetApp().GetTopWindow()->Raise();  // bring window to front
+        wxGetApp().GetTopWindow()->Show(true); // show the window
+    }
 }
 
 SuppressBackgroundProcessingUpdate::SuppressBackgroundProcessingUpdate() :
