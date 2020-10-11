@@ -2068,9 +2068,7 @@ Plater::priv::priv(Plater *q, MainFrame *main_frame)
 #if ENABLE_GCODE_VIEWER
     }
 #endif // ENABLE_GCODE_VIEWER
-#ifdef __APPLE__
-    bring_instance_forward();
-#endif // __APPLE__
+
 
 }
 

@@ -905,6 +905,10 @@ bool GUI_App::on_init_inner()
 
     update_mode(); // update view mode after fix of the object_list size
 
+#ifdef __APPLE__
+    plater()->bring_instance_forward();
+#endif // __APPLE__
+
     m_initialized = true;
     return true;
 }
